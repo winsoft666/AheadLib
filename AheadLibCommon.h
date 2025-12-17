@@ -14,7 +14,6 @@
 WCHAR* g_szCppHeader = LR"(
 #include <windows.h>
 #include <Shlwapi.h>
-
 #pragma comment( lib, "Shlwapi.lib")
 
 )";
@@ -61,7 +60,7 @@ FARPROC WINAPI GetAddress(PCSTR pszProcName)
 			pszProcName = szProcName;
 		}
 
-		wsprintf(tzTemp, TEXT("无法找到函数 %hs,程序无法正常运行"), pszProcName);
+		wsprintf(tzTemp, TEXT("Function %hs cannot be found. The program cannot run normally."), pszProcName);
 		MessageBox(NULL, tzTemp, TEXT("AheadLib"), MB_ICONSTOP);
 		ExitProcess(-2);
 	}
@@ -94,7 +93,6 @@ BOOL WINAPI Load()
 	}
 
 	return (g_OldModule != NULL);
-
 }
 
 )";
