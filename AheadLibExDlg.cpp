@@ -520,7 +520,7 @@ void CAheadLibExDlg::OnAnalyzeFile() {
                     break;
                 }
 
-                AfxMessageBox(_T("Unrecognized export function!"));
+                AfxMessageBox(_T("Unrecognized export function!"), MB_ICONERROR);
                 ExitProcess(-1);
 
                 break;
@@ -1167,7 +1167,7 @@ void CAheadLibExDlg::OnBnClickedOk() {
     m_strAsmName += "_jump.asm";
 
     if (m_strFilePath.GetLength() <= 0) {
-        AfxMessageBox(_T("No input file!"), MB_ICONINFORMATION);
+        AfxMessageBox(_T("No input file!"), MB_ICONERROR);
         return;
     }
 
@@ -1184,7 +1184,7 @@ void CAheadLibExDlg::OnBnClickedOk() {
         m_editOutputFile.GetWindowText(outputPath);
 
         if (outputPath.GetLength() <= 0) {
-            AfxMessageBox(_T("Output file path error!"), MB_ICONINFORMATION);
+            AfxMessageBox(_T("Output file path error!"), MB_ICONERROR);
             return;
         }
 
