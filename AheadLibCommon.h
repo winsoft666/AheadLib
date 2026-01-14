@@ -128,6 +128,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, PVOID pvReserved)
 				if (hThread)
 				{
 					CloseHandle(hThread);
+                    hThread = NULL;
 				}
 			}
 		}

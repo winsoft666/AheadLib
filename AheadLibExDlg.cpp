@@ -110,9 +110,9 @@ BOOL CAheadLibExDlg::OnInitDialog() {
     //初始化欢迎信息
 
     CString strWelcome;
-    strWelcome += _T("-------------------------------------------------------------------\r\n");
-    strWelcome += (STR_GITHUB_ADDRESS _T("\r\n"));
-    strWelcome += _T("-------------------------------------------------------------------\r\n");
+    strWelcome += _T("-------------------------------------------------------------------\n");
+    strWelcome += (STR_GITHUB_ADDRESS _T("\n"));
+    strWelcome += _T("-------------------------------------------------------------------\n");
     m_editInfo.SetWindowText(strWelcome);
     return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -425,9 +425,9 @@ void CAheadLibExDlg::OnAnalyzeFile() {
                             * 无法识别的函数
                             */
                             strError.Format(_T(
-                                                "Unknown .rdata section data! continue?\r\n"
-                                                "ord:%d\r\n"
-                                                "func_rva:%08X\r\n"
+                                                "Unknown .rdata section data! continue?\n"
+                                                "ord:%d\n"
+                                                "func_rva:%08X\n"
                                                 "name:%s"),
                                             exFunc->Ordinal, exFunc->FunctionRVA, exFunc->Name.GetString());
 
@@ -437,9 +437,9 @@ void CAheadLibExDlg::OnAnalyzeFile() {
                     }
                     else {
                         strError.Format(_T(
-                                            "Try to read .rdata section data exception! continue?\r\n"
-                                            "ord:%d\r\n"
-                                            "func_rva:%08X\r\n"
+                                            "Try to read .rdata section data exception! continue?\n"
+                                            "ord:%d\n"
+                                            "func_rva:%08X\n"
                                             "name:%s"),
                                         exFunc->Ordinal, exFunc->FunctionRVA, exFunc->Name.GetString());
 
@@ -477,9 +477,9 @@ void CAheadLibExDlg::OnAnalyzeFile() {
                         }
                         else {
                             strError.Format(_T(
-                                                "Try to read .data section data exception!\r\n"
-                                                "ord:%d\r\n"
-                                                "func_rva:%08X\r\n"
+                                                "Try to read .data section data exception!\n"
+                                                "ord:%d\n"
+                                                "func_rva:%08X\n"
                                                 "name:%s"),
                                             exFunc->Ordinal, exFunc->FunctionRVA, exFunc->Name.GetString());
 
@@ -502,9 +502,9 @@ void CAheadLibExDlg::OnAnalyzeFile() {
                         }
                         else {
                             strError.Format(_T(
-                                                "Try to read .data section data exception!\r\n"
-                                                "ord:%d\r\n"
-                                                "func_rva:%08X\r\n"
+                                                "Try to read .data section data exception!\n"
+                                                "ord:%d\n"
+                                                "func_rva:%08X\n"
                                                 "name:%s"),
                                             exFunc->Ordinal, exFunc->FunctionRVA, exFunc->Name.GetString());
 
@@ -561,19 +561,19 @@ void CAheadLibExDlg::OnAnalyzeFile() {
 
     for (auto element : m_vecExportFunc) {
         if (element.isFunc) {
-            strError.Format(_T("%04X    %08X    %s | %hs\r\n"),
+            strError.Format(_T("%04X    %08X    %s | %hs\n"),
                             element.Ordinal, element.FunctionRVA, element.Name.GetString(), element.secInfo.Name);
         }
         else if (element.isTranFunc) {
-            strError.Format(_T("%04X    %08X    %s | %hs | %s\r\n"),
+            strError.Format(_T("%04X    %08X    %s | %hs | %s\n"),
                             element.Ordinal, element.FunctionRVA, element.Name.GetString(), element.secInfo.Name, element.TranName.GetString());
         }
         else if (element.isData) {
-            strError.Format(_T("%04X    %08X    %s | %hs | DATA<%d>\r\n"),
+            strError.Format(_T("%04X    %08X    %s | %hs | DATA<%d>\n"),
                             element.Ordinal, element.FunctionRVA, element.Name.GetString(), element.secInfo.Name, element.isDataCount);
         }
         else if (element.isUnkown) {
-            strError.Format(_T("%04X    %08X    %s | %hs | ???\r\n"),
+            strError.Format(_T("%04X    %08X    %s | %hs | ???\n"),
                             element.Ordinal, element.FunctionRVA, element.Name.GetString(), element.secInfo.Name);
         }
         else {
@@ -586,13 +586,13 @@ void CAheadLibExDlg::OnAnalyzeFile() {
 
     strFileInfo += "NameString: ";
     strFileInfo += m_strFileName;
-    strFileInfo += "\r\n";
+    strFileInfo += "\n";
     strFileInfo += "Architecture: ";
     strFileInfo += strFileArch;
-    strFileInfo += "\r\n";
+    strFileInfo += "\n";
     strFileInfo += "TimeStamp: ";
     strFileInfo += strTimeStamp;
-    strFileInfo += "\r\n\r\n";
+    strFileInfo += "\n\n";
     strFileInfo += expEdit;
 
     m_editInfo.SetWindowText(strFileInfo);
@@ -607,35 +607,35 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
     for (auto ExportFunc : m_vecExportFunc) {
         if (ExportFunc.isTranFunc)  //
         {
-            str.Format(_T("#pragma comment(linker, \"/EXPORT:%s=%s,@%d\")\r\n"),
+            str.Format(_T("#pragma comment(linker, \"/EXPORT:%s=%s,@%d\")\n"),
                        ExportFunc.Name.GetString(), ExportFunc.TranName.GetString(), ExportFunc.Ordinal);
         }
         else if (ExportFunc.isOrd)  //序号
         {
             if (m_bIsx64) {
-                str.Format(_T("#pragma comment(linker, \"/EXPORT:Noname%d=AheadLibEx_Unnamed%d,@%d,NONAME\")\r\n"),
+                str.Format(_T("#pragma comment(linker, \"/EXPORT:Noname%d=AheadLibEx_Unnamed%d,@%d,NONAME\")\n"),
                            ExportFunc.Ordinal, ExportFunc.Ordinal, ExportFunc.Ordinal);
             }
             else {
-                str.Format(_T("#pragma comment(linker, \"/EXPORT:Noname%d=_AheadLibEx_Unnamed%d,@%d,NONAME\")\r\n"),
+                str.Format(_T("#pragma comment(linker, \"/EXPORT:Noname%d=_AheadLibEx_Unnamed%d,@%d,NONAME\")\n"),
                            ExportFunc.Ordinal, ExportFunc.Ordinal, ExportFunc.Ordinal);
             }
         }
         else  //名称
         {
             if (m_bIsx64) {
-                str.Format(_T("#pragma comment(linker, \"/EXPORT:%s=AheadLibEx_%s,@%d\")\r\n"),
+                str.Format(_T("#pragma comment(linker, \"/EXPORT:%s=AheadLibEx_%s,@%d\")\n"),
                            ExportFunc.Name.GetString(), ExportFunc.Name.GetString(), ExportFunc.Ordinal);
             }
             else {
-                str.Format(_T("#pragma comment(linker, \"/EXPORT:%s=_AheadLibEx_%s,@%d\")\r\n"),
+                str.Format(_T("#pragma comment(linker, \"/EXPORT:%s=_AheadLibEx_%s,@%d\")\n"),
                            ExportFunc.Name.GetString(), ExportFunc.Name.GetString(), ExportFunc.Ordinal);
             }
         }
         strSource += str;
     }
 
-    strSource += _T("\r\n");
+    strSource += _T("\n");
 
     //全局导出变量定义
     for (auto ExportFunc : m_vecExportFunc) {
@@ -645,21 +645,21 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
 
         if (ExportFunc.isData) {
             if (ExportFunc.isOrd) {
-                str.Format(_T("EXTERN_C PVOID AheadLibEx_Unnamed%d[%d] = { 0 };\r\n"),
+                str.Format(_T("EXTERN_C PVOID AheadLibEx_Unnamed%d[%d] = { 0 };\n"),
                            ExportFunc.Ordinal, ExportFunc.isDataCount);
             }
             else {
-                str.Format(_T("EXTERN_C PVOID AheadLibEx_%s[%d] = { 0 };\r\n"),
+                str.Format(_T("EXTERN_C PVOID AheadLibEx_%s[%d] = { 0 };\n"),
                            ExportFunc.Name.GetString(), ExportFunc.isDataCount);
             }
             strSource += str;
         }
     }
 
-    strSource += _T("\r\n");
+    strSource += _T("\n");
 
     if (m_bIsx64) {
-        strSource += _T("extern \"C\" \n{\r\n");
+        strSource += _T("extern \"C\" \n{\n");
     }
 
     for (auto ExportFunc : m_vecExportFunc) {
@@ -668,11 +668,11 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
         }
 
         if (ExportFunc.isOrd) {
-            str.Format(_T("PVOID pfnAheadLibEx_Unnamed%d;\r\n"),
+            str.Format(_T("PVOID pfnAheadLibEx_Unnamed%d;\n"),
                        ExportFunc.Ordinal);
         }
         else {
-            str.Format(_T("PVOID pfnAheadLibEx_%s;\r\n"),
+            str.Format(_T("PVOID pfnAheadLibEx_%s;\n"),
                        ExportFunc.Name.GetString());
         }
 
@@ -680,10 +680,10 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
     }
 
     if (m_bIsx64) {
-        strSource += _T("}\r\n");
+        strSource += _T("}\n");
     }
 
-    strSource += _T("\r\n");
+    strSource += _T("\n");
 
     /*
     * 其他代码
@@ -699,7 +699,7 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
     strSource += g_GetAddress;
 
     //生成Init函数代码
-    g_init = _T("BOOL WINAPI Init()\r\n{\r\n");
+    g_init = _T("BOOL WINAPI Init()\n{\n");
 
     for (auto ExportFunc : m_vecExportFunc) {
         if (ExportFunc.isTranFunc) {
@@ -707,11 +707,11 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
         }
 
         if (ExportFunc.isOrd) {
-            str.Format(_T("\tpfnAheadLibEx_Unnamed%d = GetAddress(MAKEINTRESOURCEA(%d));\r\n"),
+            str.Format(_T("\tpfnAheadLibEx_Unnamed%d = GetAddress(MAKEINTRESOURCEA(%d));\n"),
                        ExportFunc.Ordinal, ExportFunc.Ordinal);
         }
         else {
-            str.Format(_T("\tpfnAheadLibEx_%s = GetAddress(\"%s\");\r\n"),
+            str.Format(_T("\tpfnAheadLibEx_%s = GetAddress(\"%s\");\n"),
                        ExportFunc.Name.GetString(), ExportFunc.Name.GetString());
         }
 
@@ -719,11 +719,11 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
 
         if (ExportFunc.isData) {
             if (ExportFunc.isOrd) {
-                str.Format(_T("\tmemcpy(AheadLibEx_Unnamed%d,pfnAheadLibEx_Unnamed%d,sizeof(PVOID) * %d);\r\n"),
+                str.Format(_T("\tmemcpy(AheadLibEx_Unnamed%d,pfnAheadLibEx_Unnamed%d,sizeof(PVOID) * %d);\n"),
                            ExportFunc.Ordinal, ExportFunc.Ordinal, ExportFunc.isDataCount);
             }
             else {
-                str.Format(_T("\tmemcpy(AheadLibEx_%s,pfnAheadLibEx_%s,sizeof(PVOID) * %d);\r\n"),
+                str.Format(_T("\tmemcpy(AheadLibEx_%s,pfnAheadLibEx_%s,sizeof(PVOID) * %d);\n"),
                            ExportFunc.Name.GetString(), ExportFunc.Name.GetString(), ExportFunc.isDataCount);
             }
 
@@ -731,13 +731,13 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
         }
     }
 
-    g_init += _T("\treturn TRUE;\r\n");
-    g_init += _T("}\t\n");
+    g_init += _T("\treturn TRUE;\n");
+    g_init += _T("}\n");
 
     strSource += g_init;
     strSource += g_ThreadProc;
     strSource += g_Dllmain;
-    strSource += _T("\r\n");
+    strSource += _T("\n");
 
     /*
     * 生成.asm
@@ -746,7 +746,7 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
     if (m_bIsx64) {
         strAsmSource += g_szAsmHeader;
 
-        strAsmSource += _T(".DATA\r\n");
+        strAsmSource += _T(".DATA\n");
 
         for (auto ExportFun : m_vecExportFunc) {
             if (ExportFun.isTranFunc) {
@@ -757,18 +757,18 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
             }
 
             if (ExportFun.isOrd) {
-                str.Format(_T("EXTERN pfnAheadLibEx_Unnamed%d:dq;\r\n"),
+                str.Format(_T("EXTERN pfnAheadLibEx_Unnamed%d:dq;\n"),
                            ExportFun.Ordinal);
             }
             else {
-                str.Format(_T("EXTERN pfnAheadLibEx_%s:dq;\r\n"),
+                str.Format(_T("EXTERN pfnAheadLibEx_%s:dq;\n"),
                            ExportFun.Name.GetString());
             }
 
             strAsmSource += str;
         }
 
-        strAsmSource += _T("\r\n.CODE\r\n");
+        strAsmSource += _T("\n.CODE\n");
 
         for (auto ExportFun : m_vecExportFunc) {
             if (ExportFun.isTranFunc) {
@@ -780,23 +780,23 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
 
             if (ExportFun.isOrd) {
                 str.Format(_T(
-                               "AheadLibEx_Unnamed%d PROC\r\n"
-                               "\tjmp pfnAheadLibEx_Unnamed%d\r\n"
-                               "AheadLibEx_Unnamed%d ENDP\r\n\r\n"),
+                               "AheadLibEx_Unnamed%d PROC\n"
+                               "\tjmp pfnAheadLibEx_Unnamed%d\n"
+                               "AheadLibEx_Unnamed%d ENDP\n\n"),
                            ExportFun.Ordinal, ExportFun.Ordinal, ExportFun.Ordinal);
             }
             else {
                 str.Format(_T(
-                               "AheadLibEx_%s PROC\r\n"
-                               "\tjmp pfnAheadLibEx_%s\r\n"
-                               "AheadLibEx_%s ENDP\r\n\r\n"),
+                               "AheadLibEx_%s PROC\n"
+                               "\tjmp pfnAheadLibEx_%s\n"
+                               "AheadLibEx_%s ENDP\n\n"),
                            ExportFun.Name.GetString(), ExportFun.Name.GetString(), ExportFun.Name.GetString());
             }
 
             strAsmSource += str;
         }
 
-        strAsmSource += _T("\r\nEND\r\n");
+        strAsmSource += _T("\nEND\n");
     }
     else {
         for (auto ExportFun : m_vecExportFunc) {
@@ -808,22 +808,22 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
             }
 
             if (ExportFun.isOrd) {
-                str.Format(_T("EXTERN_C __declspec(naked) void __cdecl AheadLibEx_Unnamed%d(void)\r\n"
-                              "{\r\n"
-                              "\t__asm jmp pfnAheadLibEx_Unnamed%d;\r\n"
-                              "}\r\n"),
+                str.Format(_T("EXTERN_C __declspec(naked) void __cdecl AheadLibEx_Unnamed%d(void)\n"
+                              "{\n"
+                              "\t__asm jmp pfnAheadLibEx_Unnamed%d;\n"
+                              "}\n"),
                            ExportFun.Ordinal, ExportFun.Ordinal);
             }
             else {
-                str.Format(_T("EXTERN_C __declspec(naked) void __cdecl AheadLibEx_%s(void)\r\n"
-                              "{\r\n"
-                              "\t__asm jmp pfnAheadLibEx_%s;\r\n"
-                              "}\r\n"),
+                str.Format(_T("EXTERN_C __declspec(naked) void __cdecl AheadLibEx_%s(void)\n"
+                              "{\n"
+                              "\t__asm jmp pfnAheadLibEx_%s;\n"
+                              "}\n"),
                            ExportFun.Name.GetString(), ExportFun.Name.GetString());
             }
 
             strSource += str;
-            strSource += _T("\r\n");
+            strSource += _T("\n");
         }
     }
 }
@@ -839,19 +839,19 @@ void CAheadLibExDlg::OnCreateSln(CString& strSln) {
 
     HRESULT h = CoCreateGuid(&guidProject);
     if (h != S_OK) {
-        str.Format(_T("Create Sln Guid Error \r\n"));
+        str.Format(_T("Create Sln Guid Error \n"));
         AfxMessageBox(str, MB_ICONERROR);
         return;
     }
     h = CoCreateGuid(&guidVcxproj);
     if (h != S_OK) {
-        str.Format(_T("Create Vcxproj Guid Error \r\n"));
+        str.Format(_T("Create Vcxproj Guid Error \n"));
         AfxMessageBox(str, MB_ICONERROR);
         return;
     }
     h = CoCreateGuid(&guidSolution);
     if (h != S_OK) {
-        str.Format(_T("Create Solution Guid Error \r\n"));
+        str.Format(_T("Create Solution Guid Error \n"));
         AfxMessageBox(str, MB_ICONERROR);
         return;
     }
@@ -905,75 +905,75 @@ void CAheadLibExDlg::OnCreateSln(CString& strSln) {
     str.Format(_T("Project(\"%s\") = \"%s\", \"%s.vcxproj\", \"%s\""),
                m_strGuidProject.GetString(), strProjectName.GetString(), strProjectName.GetString(), m_strGuidVcxproj.GetString());
     strSln += str;
-    strSln += "\r\nEndProject\r\n";
+    strSln += "\nEndProject\n";
 
-    strSln += L"Global\r\n\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\r\n";
+    strSln += L"Global\n\tGlobalSection(SolutionConfigurationPlatforms) = preSolution\n";
     if (m_bIsx64)
-        strSln += L"\t\tDebug|x64 = Debug|x64\r\n";
+        strSln += L"\t\tDebug|x64 = Debug|x64\n";
     if (!m_bIsx64)
-        strSln += L"\t\tDebug|x86 = Debug|x86\r\n";
+        strSln += L"\t\tDebug|x86 = Debug|x86\n";
     if (m_bIsx64)
-        strSln += L"\t\tRelease|x64 = Release|x64\r\n";
+        strSln += L"\t\tRelease|x64 = Release|x64\n";
     if (!m_bIsx64)
-        strSln += L"\t\tRelease|x86 = Release|x86\r\n";
-    strSln += L"\tEndGlobalSection\r\n";
-    strSln += L"\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\r\n";
+        strSln += L"\t\tRelease|x86 = Release|x86\n";
+    strSln += L"\tEndGlobalSection\n";
+    strSln += L"\tGlobalSection(ProjectConfigurationPlatforms) = postSolution\n";
 
     //{4388BEEF - 2A07 - 4C51 - BB41 - 807B9A3E918E}.Debug | x64.ActiveCfg = Debug | x64
     if (m_bIsx64) {
-        str.Format(_T("\t\t%s.Debug|x64.ActiveCfg = Debug|x64\r\n"), m_strGuidVcxproj.GetString());
+        str.Format(_T("\t\t%s.Debug|x64.ActiveCfg = Debug|x64\n"), m_strGuidVcxproj.GetString());
         strSln += str;
-        str.Format(_T("\t\t%s.Debug|x64.Build.0 = Debug|x64\r\n"), m_strGuidVcxproj.GetString());
+        str.Format(_T("\t\t%s.Debug|x64.Build.0 = Debug|x64\n"), m_strGuidVcxproj.GetString());
         strSln += str;
     }
     if (!m_bIsx64) {
-        str.Format(_T("\t\t%s.Debug|x86.ActiveCfg = Debug|Win32\r\n"), m_strGuidVcxproj.GetString());
+        str.Format(_T("\t\t%s.Debug|x86.ActiveCfg = Debug|Win32\n"), m_strGuidVcxproj.GetString());
         strSln += str;
-        str.Format(_T("\t\t%s.Debug|x86.Build.0 = Debug|Win32\r\n"), m_strGuidVcxproj.GetString());
+        str.Format(_T("\t\t%s.Debug|x86.Build.0 = Debug|Win32\n"), m_strGuidVcxproj.GetString());
         strSln += str;
     }
     if (m_bIsx64) {
-        str.Format(_T("\t\t%s.Release|x64.ActiveCfg = Release|x64\r\n"), m_strGuidVcxproj.GetString());
+        str.Format(_T("\t\t%s.Release|x64.ActiveCfg = Release|x64\n"), m_strGuidVcxproj.GetString());
         strSln += str;
-        str.Format(_T("\t\t%s.Release|x64.Build.0 = Release|x64\r\n"), m_strGuidVcxproj.GetString());
+        str.Format(_T("\t\t%s.Release|x64.Build.0 = Release|x64\n"), m_strGuidVcxproj.GetString());
         strSln += str;
     }
     if (!m_bIsx64) {
-        str.Format(_T("\t\t%s.Release|x86.ActiveCfg = Release|Win32\r\n"), m_strGuidVcxproj.GetString());
+        str.Format(_T("\t\t%s.Release|x86.ActiveCfg = Release|Win32\n"), m_strGuidVcxproj.GetString());
         strSln += str;
-        str.Format(_T("\t\t%s.Release|x86.Build.0 = Release|Win32\r\n"), m_strGuidVcxproj.GetString());
+        str.Format(_T("\t\t%s.Release|x86.Build.0 = Release|Win32\n"), m_strGuidVcxproj.GetString());
         strSln += str;
     }
 
     strSln +=
-        L"\tEndGlobalSection\r\n \
-\tGlobalSection(SolutionProperties) = preSolution\r\n \
-\t\tHideSolutionNode = FALSE \r\n\
-\tEndGlobalSection \r\n\
-\tGlobalSection(ExtensibilityGlobals) = postSolution\r\n";
+        L"\tEndGlobalSection\n \
+\tGlobalSection(SolutionProperties) = preSolution\n \
+\t\tHideSolutionNode = FALSE \n\
+\tEndGlobalSection \n\
+\tGlobalSection(ExtensibilityGlobals) = postSolution\n";
 
-    str.Format(_T("\t\tSolutionGuid = %s\r\n"), m_strGuidSolution.GetString());
+    str.Format(_T("\t\tSolutionGuid = %s\n"), m_strGuidSolution.GetString());
     strSln += str;
-    strSln += L"\tEndGlobalSection\r\nEndGlobal";
+    strSln += L"\tEndGlobalSection\nEndGlobal";
 }
 void CAheadLibExDlg::OnCreateVcxproj(CString& strVcxproj) {
     CString str;
 
     strVcxproj += (m_bIsx64 ? g_szVcxProjectHeader64 : g_szVcxProjectHeader86);
 
-    str.Format(_T("  <ItemGroup>\r\n <ClCompile Include=\"%s.cpp\" />\r\n  </ItemGroup>\r\n"), m_strFileNameNOExtension.GetString());
+    str.Format(_T("  <ItemGroup>\n <ClCompile Include=\"%s.cpp\" />\n  </ItemGroup>\n"), m_strFileNameNOExtension.GetString());
     strVcxproj += str;
 
     if (m_bIsx64) {
-        str.Format(_T("  <ItemGroup>\r\n <MASM Include=\"%s\" />\r\n  </ItemGroup>\r\n"), m_strAsmName.GetString());
+        str.Format(_T("  <ItemGroup>\n <MASM Include=\"%s\" />\n  </ItemGroup>\n"), m_strAsmName.GetString());
         strVcxproj += str;
     }
-    str.Format(_T("  <PropertyGroup Label=\"Globals\">\r\n\
-    <VCProjectVersion>16.0</VCProjectVersion>\r\n\
-    <Keyword>Win32Proj</Keyword>\r\n\
-    <ProjectGuid>%s</ProjectGuid>\r\n\
-    <RootNamespace>%s</RootNamespace>\r\n\
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>\r\n\
+    str.Format(_T("  <PropertyGroup Label=\"Globals\">\n\
+    <VCProjectVersion>16.0</VCProjectVersion>\n\
+    <Keyword>Win32Proj</Keyword>\n\
+    <ProjectGuid>%s</ProjectGuid>\n\
+    <RootNamespace>%s</RootNamespace>\n\
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>\n\
   </PropertyGroup>"),
                m_strGuidVcxproj.GetString(), m_strFileNameNOExtension.GetString());
     strVcxproj += g_szVcxProjectEnd;
@@ -997,19 +997,19 @@ void CAheadLibExDlg::OnCreateFilters(CString& strFilters) {
 
     HRESULT h = CoCreateGuid(&guidSourceFiles);
     if (h != S_OK) {
-        str.Format(_T("Create ResourceFiles Guid Error \r\n"));
+        str.Format(_T("Create ResourceFiles Guid Error \n"));
         AfxMessageBox(str, MB_ICONERROR);
         return;
     }
     h = CoCreateGuid(&guidHeaderFiles);
     if (h != S_OK) {
-        str.Format(_T("Create HeaderFiles Guid Error \r\n"));
+        str.Format(_T("Create HeaderFiles Guid Error \n"));
         AfxMessageBox(str, MB_ICONERROR);
         return;
     }
     h = CoCreateGuid(&guidResourceFiles);
     if (h != S_OK) {
-        str.Format(_T("Create ResourceFiles Guid Error \r\n"));
+        str.Format(_T("Create ResourceFiles Guid Error \n"));
         AfxMessageBox(str, MB_ICONERROR);
         return;
     }
