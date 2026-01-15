@@ -16,6 +16,9 @@ WCHAR* g_szCppHeader = LR"(
 #include <Shlwapi.h>
 #pragma comment( lib, "Shlwapi.lib")
 
+static HMODULE g_OldDllModule = NULL;
+static HANDLE g_WorkThread = NULL;
+
 )";
 
 WCHAR* g_szAsmHeader = LR"(
@@ -32,13 +35,19 @@ WCHAR* g_szAsmHeader = LR"(
 )";
 
 WCHAR* g_Free = LR"(
-static HMODULE g_OldModule = NULL;
-
 VOID WINAPI Free()
 {
-	if (g_OldModule)
+    if(g_WorkThread)
+    {
+        WaitForSingleObject(g_WorkThread, INFINITE);
+        CloseHandle(g_WorkThread);
+        g_WorkThread = NULL;
+    }
+
+	if (g_OldDllModule)
 	{
-		FreeLibrary(g_OldModule);
+		FreeLibrary(g_OldDllModule);
+        g_OldDllModule = NULL;
 	}
 }
 
@@ -48,10 +57,10 @@ WCHAR* g_GetAddress = LR"(
 FARPROC WINAPI GetAddress(PCSTR pszProcName)
 {
 	FARPROC fpAddress;
-	CHAR szProcName[64];
-	TCHAR tzTemp[MAX_PATH];
+	CHAR szProcName[64] = {0};
+	TCHAR tzTemp[MAX_PATH] = {0};
 
-	fpAddress = GetProcAddress(g_OldModule, pszProcName);
+	fpAddress = GetProcAddress(g_OldDllModule, pszProcName);
 	if (fpAddress == NULL)
 	{
 		if (HIWORD(pszProcName) == 0)
@@ -61,7 +70,7 @@ FARPROC WINAPI GetAddress(PCSTR pszProcName)
 		}
 
 		wsprintf(tzTemp, TEXT("Function %hs cannot be found. The program cannot run normally."), pszProcName);
-		MessageBox(NULL, tzTemp, TEXT("AheadLib"), MB_ICONSTOP);
+		MessageBox(NULL, tzTemp, TEXT("AheadLib"), MB_ICONWARNING);
 		ExitProcess(-2);
 	}
 	return fpAddress;
@@ -70,29 +79,31 @@ FARPROC WINAPI GetAddress(PCSTR pszProcName)
 )";
 
 WCHAR* g_Load = LR"(
-BOOL WINAPI Load()
+BOOL WINAPI Load(HMODULE hDllModule)
 {
-	TCHAR tzPath[MAX_PATH];
-	TCHAR tzTemp[MAX_PATH * 2];
+	TCHAR tzPath[MAX_PATH] = {0};
+	TCHAR tzTemp[MAX_PATH * 2] = {0};
 
-	//
-	// 这里是否从系统目录或当前目录加载原始DLL
-	//
-	//GetModuleFileName(NULL,tzPath,MAX_PATH); //获取本目录下的
-	//PathRemoveFileSpec(tzPath);
+	// Load the original DLL from the current directory where the DLL is located or from the system directory.
+#if 0
+    // Current DLL Directory
+	GetModuleFileName(hDllModule,tzPath,MAX_PATH);
+	PathRemoveFileSpec(tzPath);
+#else
+    // System Directory
+	GetSystemDirectory(tzPath, MAX_PATH);
+#endif
+    PathAddBackslash(tzPath);
+	lstrcat(tzPath, TEXT("AHEADLIB_XXXXXX.dll"));
 
-	GetSystemDirectory(tzPath, MAX_PATH); //默认获取系统目录的
-
-	lstrcat(tzPath, TEXT("\\AHEADLIB_XXXXXX.dll"));
-
-	g_OldModule = LoadLibrary(tzPath);
-	if (g_OldModule == NULL)
+	g_OldDllModule = LoadLibrary(tzPath);
+	if (g_OldDllModule == NULL)
 	{
 		wsprintf(tzTemp, TEXT("Module %s cannot be found. The program cannot run normally."), tzPath);
 		MessageBox(NULL, tzTemp, TEXT("AheadLib"), MB_ICONSTOP);
 	}
 
-	return (g_OldModule != NULL);
+	return (g_OldDllModule != NULL);
 }
 
 )";
@@ -112,24 +123,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, PVOID pvReserved)
 	{
 		DisableThreadLibraryCalls(hModule);
 
-		if (Load() && Init())
+		if (Load(hModule) && Init())
 		{
-			TCHAR szAppName[MAX_PATH] = TEXT("MyApp.exe");//请修改宿主进程名
+			TCHAR szAppName[MAX_PATH] = TEXT("MyApp.exe"); // TODO
 			TCHAR szCurName[MAX_PATH];
 
 			GetModuleFileName(NULL, szCurName, MAX_PATH);
 			PathStripPath(szCurName);
 
-			//判断是否为宿主进程名
+			// Determine whether it is the name of the host process
 			if (StrCmpI(szCurName, szAppName) == 0)
 			{
-				//启动线程进行其他操作
-				HANDLE hThread = CreateThread(NULL, NULL, ThreadProc, NULL, NULL, NULL);
-				if (hThread)
-				{
-					CloseHandle(hThread);
-                    hThread = NULL;
-				}
+				// Start work thread.
+				g_WorkThread = CreateThread(NULL, NULL, ThreadProc, NULL, NULL, NULL);
 			}
 		}
 	}

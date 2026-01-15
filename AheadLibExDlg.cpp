@@ -604,6 +604,7 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
     CString str;
     strSource += g_szCppHeader;
 
+    strSource += _T("#pragma region ForwardFunctions\n");
     for (auto ExportFunc : m_vecExportFunc) {
         if (ExportFunc.isTranFunc)  //
         {
@@ -634,10 +635,12 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
         }
         strSource += str;
     }
+    strSource += _T("#pragma endregion\n");
 
     strSource += _T("\n");
 
     //全局导出变量定义
+    strSource += _T("#pragma region GlobalExportVariables\n");
     for (auto ExportFunc : m_vecExportFunc) {
         if (ExportFunc.isTranFunc) {
             continue;
@@ -655,9 +658,11 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
             strSource += str;
         }
     }
+    strSource += _T("#pragma endregion\n");
 
     strSource += _T("\n");
 
+    strSource += _T("#pragma region DefineOriginalFunctionPointer\n");
     if (m_bIsx64) {
         strSource += _T("extern \"C\" \n{\n");
     }
@@ -682,6 +687,7 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
     if (m_bIsx64) {
         strSource += _T("}\n");
     }
+    strSource += _T("#pragma endregion\n");
 
     strSource += _T("\n");
 
@@ -799,6 +805,7 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
         strAsmSource += _T("\nEND\n");
     }
     else {
+        strSource += _T("#pragma region DefineDetourFunctions\n");
         for (auto ExportFun : m_vecExportFunc) {
             if (ExportFun.isTranFunc) {
                 continue;
@@ -825,6 +832,7 @@ void CAheadLibExDlg::OnCreateCppSource(CString& strSource, CString& strAsmSource
             strSource += str;
             strSource += _T("\n");
         }
+        strSource += _T("#pragma endregion\n");
     }
 }
 
